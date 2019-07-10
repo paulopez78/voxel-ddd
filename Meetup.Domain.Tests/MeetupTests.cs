@@ -2,12 +2,12 @@ using System;
 using Xunit;
 using Meetup.Domain;
 using AutoFixture;
+using static Meetup.Domain.Tests.MeetupTestExtensions;
 
 namespace Meetup.Domain.Tests
 {
     public class MeetupTests
     {
-        public Fixture Auto { get; } = new Fixture();
 
         [Fact]
         public void MeetupCreateTest()
@@ -22,30 +22,25 @@ namespace Meetup.Domain.Tests
         }
 
         [Fact]
-        public void MeetupPublishTest()
-        {
-            var title = Auto.Create<MeetupTitle>();
-            var location = Auto.Create<Location>();
-            var seats = new NumberOfSeats(10);
-
-            var meetup = new Meetup(title, location);
-            meetup.UpdateNumberOfSeats(seats);
-            meetup.Publish();
-
-            Assert.Equal(seats, meetup.NumberOfSeats);
-            Assert.Equal(MeetupState.Published, meetup.State);
-        }
+        public void GivenCreatedMeetup_When_Publish_WithNumberOfSeats_Then_Published() =>
+            GivenCreatedMeetup(
+                when: meetup =>
+                {
+                    meetup.UpdateNumberOfSeats(seats);
+                    meetup.Publish();
+                },
+                then: meetup =>
+                {
+                    Assert.Equal(seats, meetup.NumberOfSeats);
+                    Assert.Equal(MeetupState.Published, meetup.State);
+                }
+            );
 
         [Fact]
-        public void MeetupInvalidNumberOfSeatsTest()
-        {
-            var title = Auto.Create<MeetupTitle>();
-            var location = Auto.Create<Location>();
-
-            var meetup = new Meetup(title, location);
-            Assert.Throws<ArgumentException>(
-                () => meetup.Publish());
-        }
+        public void GivenCreatedMeetup_When_Publish_Then_Throws() =>
+            GivenCreatedMeetup<ArgumentException>(
+                when: meetup => meetup.Publish()
+            );
 
         [Theory]
         [InlineData(1)]
@@ -73,6 +68,27 @@ namespace Meetup.Domain.Tests
 
             Assert.Equal(a, b);
             Assert.True(a == b);
+        }
+    }
+
+    public static class MeetupTestExtensions
+    {
+        public static Fixture Auto { get; } = new Fixture();
+        public static MeetupTitle title = Auto.Create<MeetupTitle>();
+        public static Location location = Auto.Create<Location>();
+        public static NumberOfSeats seats = new NumberOfSeats(10);
+
+        public static void GivenCreatedMeetup<TException>(Action<Meetup> when)
+        where TException : Exception
+        {
+            var meetup = new Meetup(title, location);
+            Assert.Throws<TException>(() => when(meetup));
+        }
+        public static void GivenCreatedMeetup(Action<Meetup> when, Action<Meetup> then)
+        {
+            var meetup = new Meetup(title, location);
+            when(meetup);
+            then(meetup);
         }
     }
 }
