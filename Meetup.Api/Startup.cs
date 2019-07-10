@@ -21,6 +21,8 @@ namespace Meetup.Api
             services.AddSingleton<AddressValidator>(address => true);
             services.AddScoped<MeetupAppService>();
             services.AddScoped<MeetupRepository>();
+            // var messageBroker = Configuration.GetValue("messagebroker", "host=localhost;username=guest;password=guest;publisherConfirms=true");
+            // services.AddSingleton<IBus>(RabbitHutch.CreateBus(messageBroker));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
