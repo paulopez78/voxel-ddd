@@ -1,4 +1,6 @@
 #nullable disable
+using System;
+
 namespace Meetup.Domain
 {
     public static class Events
@@ -16,6 +18,22 @@ namespace Meetup.Domain
         public class NumberOfSeatsUpdated
         {
             public int NumberOfSeats { get; set; }
+        }
+
+        public class MeetupCanceled
+        {
+        }
+
+        public class RSVPAccepted
+        {
+            public Guid MemberId { get; set; }
+            public DateTime AcceptedAt { get; set; }
+        }
+
+        public class RSVPDeclined
+        {
+            public DateTime DeclinedAt { get; set; }
+            public Guid MemberId { get; set; }
         }
     }
 }

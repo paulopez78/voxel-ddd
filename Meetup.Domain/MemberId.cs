@@ -12,13 +12,16 @@ namespace Meetup.Domain
 
             Value = memberId;
         }
+        private MemberId() { }
 
-        public Guid Value { get; }
+        public Guid Value { get; private set; }
 
         public static implicit operator Guid(MemberId id) => id.Value;
         protected override IEnumerable<object> GetAtomicValues()
         {
             yield return Value;
         }
+
+        public static MemberId From(Guid memberId) => new MemberId { Value = memberId };
     }
 }

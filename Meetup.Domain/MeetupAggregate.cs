@@ -22,6 +22,40 @@ namespace Meetup.Domain
             Apply(new Events.MeetupCreated { Title = title, Location = location });
         }
 
+        public void UpdateNumberOfSeats(NumberOfSeats seats)
+        {
+            Apply(new Events.NumberOfSeatsUpdated { NumberOfSeats = seats });
+        }
+
+        public void Publish()
+        {
+            if (NumberOfSeats == NumberOfSeats.None) throw new ArgumentException(nameof(NumberOfSeats));
+            State.TransitionTo(MeetupState.Published);
+            Apply(new Events.MeetupPublished());
+        }
+
+        public void Cancel()
+        {
+            State = State.TransitionTo(MeetupState.Canceled);
+            Apply(new Events.MeetupCanceled());
+        }
+
+        public void AcceptRSVP(MemberId memberId, DateTime acceptedAt)
+        {
+            if (State != MeetupState.Published)
+                throw new ArgumentException(nameof(memberId));
+
+            Apply(new Events.RSVPAccepted { MemberId = memberId, AcceptedAt = acceptedAt });
+        }
+
+        public void DeclineRSVP(MemberId memberId, DateTime declineAt)
+        {
+            if (State != MeetupState.Published)
+                throw new ArgumentException(nameof(memberId));
+
+            Apply(new Events.RSVPDeclined { MemberId = memberId, DeclinedAt = declineAt });
+        }
+
         public void Apply(object @event)
         {
             _events.Add(@event);
@@ -48,40 +82,19 @@ namespace Meetup.Domain
                 case Events.MeetupPublished published:
                     State = MeetupState.Published;
                     break;
+
+                case Events.MeetupCanceled canceled:
+                    State = MeetupState.Canceled;
+                    break;
+
+                case Events.RSVPAccepted accepted:
+                    _membersGoing.Add(MemberId.From(accepted.MemberId), accepted.AcceptedAt);
+                    break;
+
+                case Events.RSVPDeclined declined:
+                    _membersNotGoing.Add(MemberId.From(declined.MemberId), declined.DeclinedAt);
+                    break;
             }
-        }
-
-        public void UpdateNumberOfSeats(NumberOfSeats seats)
-        {
-            Apply(new Events.NumberOfSeatsUpdated { NumberOfSeats = seats });
-        }
-
-        public void Publish()
-        {
-            if (NumberOfSeats == NumberOfSeats.None) throw new ArgumentException(nameof(NumberOfSeats));
-            State.TransitionTo(MeetupState.Published);
-            Apply(new Events.MeetupPublished());
-        }
-
-        public void Cancel()
-        {
-            State = State.TransitionTo(MeetupState.Canceled);
-        }
-
-        public void AcceptRSVP(MemberId memberId, DateTime acceptedAt)
-        {
-            if (State != MeetupState.Published)
-                throw new ArgumentException(nameof(memberId));
-
-            _membersGoing.Add(memberId, acceptedAt);
-        }
-
-        public void DeclineRSVP(MemberId memberId, DateTime declineAt)
-        {
-            if (State != MeetupState.Published)
-                throw new ArgumentException(nameof(memberId));
-
-            _membersNotGoing.Add(memberId, declineAt);
         }
     }
 
