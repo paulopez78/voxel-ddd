@@ -6,7 +6,7 @@ namespace Meetup.Domain
     {
         public string Title { get; }
         public string Location { get; }
-        public int NumberOfSeats { get; private set; }
+        public NumberOfSeats NumberOfSeats { get; private set; }
         public MeetupState State { get; private set; }
 
         public Meetup(string title, string location)
@@ -14,17 +14,17 @@ namespace Meetup.Domain
             Title = title;
             Location = location;
             State = MeetupState.Created;
+            NumberOfSeats = NumberOfSeats.None;
         }
 
-        public void UpdateNumberOfSeats(int seats)
+        public void UpdateNumberOfSeats(NumberOfSeats seats)
         {
-            if (seats < 1 || seats > 1000) throw new ArgumentException(nameof(seats));
             NumberOfSeats = seats;
         }
 
         public void Publish()
         {
-            if (NumberOfSeats < 1 || NumberOfSeats > 1000) throw new ArgumentException(nameof(NumberOfSeats));
+            if (NumberOfSeats == NumberOfSeats.None) throw new ArgumentException(nameof(NumberOfSeats));
             State = MeetupState.Published;
         }
     }

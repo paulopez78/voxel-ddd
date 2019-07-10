@@ -26,7 +26,7 @@ namespace Meetup.Domain.Tests
         {
             var title = Auto.Create<string>();
             var location = Auto.Create<string>();
-            var seats = Auto.Create<int>();
+            var seats = new NumberOfSeats(10);
 
             var meetup = new Meetup(title, location);
             meetup.UpdateNumberOfSeats(seats);
@@ -41,13 +41,38 @@ namespace Meetup.Domain.Tests
         {
             var title = Auto.Create<string>();
             var location = Auto.Create<string>();
-            var seats = 0;
 
             var meetup = new Meetup(title, location);
             Assert.Throws<ArgumentException>(
                 () => meetup.Publish());
+        }
+
+        [Theory]
+        [InlineData(1)]
+        [InlineData(1000)]
+        public void ValidNumberOfSeatsTest(int seats)
+        {
+            Assert.Equal(seats, new NumberOfSeats(seats).Value);
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-1)]
+        [InlineData(1001)]
+        public void InvalidNumberOfSeatsTest(int seats)
+        {
             Assert.Throws<ArgumentException>(
-                () => meetup.UpdateNumberOfSeats(seats));
+                () => new NumberOfSeats(seats));
+        }
+
+        [Fact]
+        public void EqualNumberOfSeats()
+        {
+            var a = new NumberOfSeats(10);
+            var b = new NumberOfSeats(10);
+
+            Assert.Equal(a, b);
+            // Assert.True(a == b);
         }
     }
 }
