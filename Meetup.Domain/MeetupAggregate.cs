@@ -13,12 +13,19 @@ namespace Meetup.Domain
         private Dictionary<MemberId, DateTime> _membersGoing = new Dictionary<MemberId, DateTime>();
         public IReadOnlyDictionary<MemberId, DateTime> MembersGoing => _membersGoing;
         private Dictionary<MemberId, DateTime> _membersNotGoing = new Dictionary<MemberId, DateTime>();
-
         public IReadOnlyDictionary<MemberId, DateTime> MembersNotGoing => _membersNotGoing;
+        private List<object> _events = new List<object>();
+        public IEnumerable<object> Events => _events.AsEnumerable();
 
         public MeetupAggregate(MeetupTitle title, Location location)
         {
-            When(new Events.MeetupCreated { Title = title, Location = location });
+            Apply(new Events.MeetupCreated { Title = title, Location = location });
+        }
+
+        public void Apply(object @event)
+        {
+            _events.Add(@event);
+            When(@event);
         }
 
         public void When(object @event)
@@ -33,18 +40,27 @@ namespace Meetup.Domain
                     _membersGoing = new Dictionary<MemberId, DateTime>();
                     _membersNotGoing = new Dictionary<MemberId, DateTime>();
                     break;
+
+                case Events.NumberOfSeatsUpdated seatsUpdated:
+                    NumberOfSeats = NumberOfSeats.From(seatsUpdated.NumberOfSeats);
+                    break;
+
+                case Events.MeetupPublished published:
+                    State = MeetupState.Published;
+                    break;
             }
         }
 
         public void UpdateNumberOfSeats(NumberOfSeats seats)
         {
-            NumberOfSeats = seats;
+            Apply(new Events.NumberOfSeatsUpdated { NumberOfSeats = seats });
         }
 
         public void Publish()
         {
             if (NumberOfSeats == NumberOfSeats.None) throw new ArgumentException(nameof(NumberOfSeats));
-            State = State.TransitionTo(MeetupState.Published);
+            State.TransitionTo(MeetupState.Published);
+            Apply(new Events.MeetupPublished());
         }
 
         public void Cancel()

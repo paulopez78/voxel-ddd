@@ -4,6 +4,7 @@ using Meetup.Domain;
 using AutoFixture;
 using static Meetup.Domain.Tests.MeetupTestExtensions;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Meetup.Domain.Tests
 {
@@ -32,8 +33,11 @@ namespace Meetup.Domain.Tests
                 },
                 then: meetup =>
                 {
-                    Assert.Equal(seats, meetup.NumberOfSeats);
-                    Assert.Equal(MeetupState.Published, meetup.State);
+                    Assert.IsType<Events.MeetupCreated>(meetup.Events.First());
+                    Assert.IsType<Events.MeetupPublished>(meetup.Events.Last());
+
+                    // Assert.Equal(seats, meetup.NumberOfSeats);
+                    // Assert.Equal(MeetupState.Published, meetup.State);
                 }
             );
 

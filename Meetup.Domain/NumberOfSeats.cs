@@ -12,7 +12,7 @@ namespace Meetup.Domain
         }
         private NumberOfSeats() { }
 
-        public int Value { get; } = 0;
+        public int Value { get; private set; } = 0;
 
         public static NumberOfSeats None = new NumberOfSeats();
 
@@ -22,5 +22,7 @@ namespace Meetup.Domain
         {
             yield return Value;
         }
+
+        public static NumberOfSeats From(int numberOfSeats) => new NumberOfSeats { Value = numberOfSeats };
     }
 }

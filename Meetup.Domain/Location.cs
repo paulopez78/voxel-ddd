@@ -32,6 +32,6 @@ namespace Meetup.Domain
             yield return Value;
         }
 
-        public Location From(string location) => new Location() { Value = location };
+        public static Location From(string location) => new Location() { Value = location };
     }
 }
