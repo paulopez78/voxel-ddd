@@ -52,7 +52,7 @@ namespace Meetup.Domain.Tests
         [InlineData(1000)]
         public void ValidNumberOfSeatsTest(int seats)
         {
-            Assert.Equal(seats, new NumberOfSeats(seats).Value);
+            Assert.Equal(seats, new NumberOfSeats(seats));
         }
 
         [Theory]
@@ -72,7 +72,7 @@ namespace Meetup.Domain.Tests
             var b = new NumberOfSeats(10);
 
             Assert.Equal(a, b);
-            // Assert.True(a == b);
+            Assert.True(a == b);
         }
     }
 }

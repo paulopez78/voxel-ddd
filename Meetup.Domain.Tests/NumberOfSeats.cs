@@ -1,8 +1,9 @@
 using System;
+using System.Collections.Generic;
 
 namespace Meetup.Domain
 {
-    public class NumberOfSeats : IEquatable<NumberOfSeats>
+    public class NumberOfSeats : ValueObject
     {
         public NumberOfSeats(int seats)
         {
@@ -15,7 +16,11 @@ namespace Meetup.Domain
 
         public static NumberOfSeats None = new NumberOfSeats();
 
-        public bool Equals(NumberOfSeats other) =>
-            other.Value == Value;
+        public static implicit operator int(NumberOfSeats number) => number.Value;
+
+        protected override IEnumerable<object> GetAtomicValues()
+        {
+            yield return Value;
+        }
     }
 }
