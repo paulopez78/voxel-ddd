@@ -27,31 +27,31 @@ namespace Meetup.Api.Controllers
             throw new NotImplementedException();
         }
 
-        [HttpPost("seats")]
-        public Task<ActionResult> Post(Meetup.V1.UpdateNumberOfSeats request)
+        [HttpPut("seats")]
+        public Task<ActionResult> Put(Meetup.V1.UpdateNumberOfSeats request)
         {
             throw new NotImplementedException();
         }
 
-        [HttpPost("publish")]
+        [HttpPut("publish")]
         public Task<ActionResult> Put(Meetup.V1.Publish request)
         {
             throw new NotImplementedException();
         }
 
-        [HttpPost("cancel")]
+        [HttpPut("cancel")]
         public Task<ActionResult> Put(Meetup.V1.Cancel request)
         {
             throw new NotImplementedException();
         }
 
-        [HttpPost("acceptrsvp")]
+        [HttpPut("acceptrsvp")]
         public Task<ActionResult> Put(Meetup.V1.AcceptRSVP request)
         {
             throw new NotImplementedException();
         }
 
-        [HttpPost("declinersvp")]
+        [HttpPut("declinersvp")]
         public Task<ActionResult> Put(Meetup.V1.DeclineRSVP request)
         {
             throw new NotImplementedException();
