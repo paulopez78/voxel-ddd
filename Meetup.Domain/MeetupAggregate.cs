@@ -83,6 +83,7 @@ namespace Meetup.Domain
             switch (@event)
             {
                 case Events.MeetupCreated created:
+                    Id = MeetupId.From(created.MeetupId);
                     Title = MeetupTitle.From(created.Title);
                     Location = Location.From(created.Location);
                     State = MeetupState.Created;
