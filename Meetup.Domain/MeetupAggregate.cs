@@ -6,6 +6,7 @@ namespace Meetup.Domain
 {
     public class MeetupAggregate
     {
+        public MeetupId Id { get; private set; } = MeetupId.None;
         public MeetupTitle Title { get; private set; } = MeetupTitle.None;
         public Location Location { get; private set; } = Location.None;
         public NumberOfSeats NumberOfSeats { get; private set; } = NumberOfSeats.None;
@@ -17,27 +18,42 @@ namespace Meetup.Domain
         private List<object> _events = new List<object>();
         public IEnumerable<object> Events => _events.AsEnumerable();
 
-        public MeetupAggregate(MeetupTitle title, Location location)
+        public MeetupAggregate(
+            MeetupId id,
+            MeetupTitle title,
+            Location location,
+            NumberOfSeats seats,
+            MeetupState state,
+            Dictionary<MemberId, DateTime> going,
+            Dictionary<MemberId, DateTime> notGoing)
         {
-            Apply(new Events.MeetupCreated { Title = title, Location = location });
+            Id = id;
+            Title = title;
+            Location = location;
+            NumberOfSeats = seats;
+            State = state;
+            _membersGoing = going;
+            _membersNotGoing = notGoing;
         }
 
-        public void UpdateNumberOfSeats(NumberOfSeats seats)
-        {
-            Apply(new Events.NumberOfSeatsUpdated { NumberOfSeats = seats });
-        }
+        public MeetupAggregate(MeetupId id, MeetupTitle title, Location location) =>
+            Apply(new Events.MeetupCreated { MeetupId = id, Title = title, Location = location });
+
+        public void UpdateNumberOfSeats(NumberOfSeats seats) =>
+            Apply(new Events.NumberOfSeatsUpdated { MeetupId = Id, NumberOfSeats = seats });
 
         public void Publish()
         {
             if (NumberOfSeats == NumberOfSeats.None) throw new ArgumentException(nameof(NumberOfSeats));
             State.TransitionTo(MeetupState.Published);
-            Apply(new Events.MeetupPublished());
+
+            Apply(new Events.MeetupPublished { MeetupId = Id });
         }
 
         public void Cancel()
         {
             State = State.TransitionTo(MeetupState.Canceled);
-            Apply(new Events.MeetupCanceled());
+            Apply(new Events.MeetupCanceled { MeetupId = Id });
         }
 
         public void AcceptRSVP(MemberId memberId, DateTime acceptedAt)
@@ -45,7 +61,7 @@ namespace Meetup.Domain
             if (State != MeetupState.Published)
                 throw new ArgumentException(nameof(memberId));
 
-            Apply(new Events.RSVPAccepted { MemberId = memberId, AcceptedAt = acceptedAt });
+            Apply(new Events.RSVPAccepted { MeetupId = Id, MemberId = memberId, AcceptedAt = acceptedAt });
         }
 
         public void DeclineRSVP(MemberId memberId, DateTime declineAt)
@@ -53,7 +69,7 @@ namespace Meetup.Domain
             if (State != MeetupState.Published)
                 throw new ArgumentException(nameof(memberId));
 
-            Apply(new Events.RSVPDeclined { MemberId = memberId, DeclinedAt = declineAt });
+            Apply(new Events.RSVPDeclined { MeetupId = Id, MemberId = memberId, DeclinedAt = declineAt });
         }
 
         public void Apply(object @event)

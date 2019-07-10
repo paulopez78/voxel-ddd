@@ -1,6 +1,5 @@
 using System;
 using Xunit;
-using Meetup.Domain;
 using AutoFixture;
 using static Meetup.Domain.Tests.MeetupTestExtensions;
 using System.Collections.Generic;
@@ -14,10 +13,7 @@ namespace Meetup.Domain.Tests
         [Fact]
         public void MeetupCreateTest()
         {
-            var title = Auto.Create<MeetupTitle>();
-            var location = Auto.Create<Location>();
-
-            var meetup = new MeetupAggregate(title, location);
+            var meetup = new MeetupAggregate(id, title, location);
             Assert.Equal(title, meetup.Title);
             Assert.Equal(location, meetup.Location);
             Assert.Equal(MeetupState.Created, meetup.State);
@@ -109,6 +105,7 @@ namespace Meetup.Domain.Tests
     public static class MeetupTestExtensions
     {
         public static Fixture Auto { get; } = new Fixture();
+        public static MeetupId id = Auto.Create<MeetupId>();
         public static MeetupTitle title = Auto.Create<MeetupTitle>();
         public static Location location = Auto.Create<Location>();
         public static NumberOfSeats seats = new NumberOfSeats(10);
@@ -116,20 +113,20 @@ namespace Meetup.Domain.Tests
         public static void GivenCreatedMeetup<TException>(Action<MeetupAggregate> when)
         where TException : Exception
         {
-            var meetup = new MeetupAggregate(title, location);
+            var meetup = new MeetupAggregate(id, title, location);
             Assert.Throws<TException>(() => when(meetup));
         }
 
         public static void GivenCreatedMeetup(Action<MeetupAggregate> when, Action<MeetupAggregate> then)
         {
-            var meetup = new MeetupAggregate(title, location);
+            var meetup = new MeetupAggregate(id, title, location);
             when(meetup);
             then(meetup);
         }
 
         public static void GivenPublishedMeetup(Action<MeetupAggregate> when, Action<MeetupAggregate> then)
         {
-            var meetup = new MeetupAggregate(title, location);
+            var meetup = new MeetupAggregate(id, title, location);
             meetup.UpdateNumberOfSeats(seats);
             meetup.Publish();
             when(meetup);
