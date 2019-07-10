@@ -61,6 +61,18 @@ namespace Meetup.Domain.Tests
             );
         }
 
+        [Fact]
+        public void GivenPublishedMeetup_When_DeclineRSVP_Then_MemberNotGoing()
+        {
+            var memberId = Auto.Create<MemberId>();
+            var declinedAt = Auto.Create<DateTime>();
+
+            GivenPublishedMeetup(
+                when: meetup => meetup.DeclineRSVP(memberId, declinedAt),
+                then: meetup => meetup.MembersNotGoing.AssertContains(memberId)
+            );
+        }
+
         [Theory]
         [InlineData(1)]
         [InlineData(1000)]

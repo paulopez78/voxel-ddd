@@ -13,6 +13,9 @@ namespace Meetup.Domain
         private readonly Dictionary<MemberId, DateTime> _membersGoing;
         public IReadOnlyDictionary<MemberId, DateTime> MembersGoing => _membersGoing;
 
+        private readonly Dictionary<MemberId, DateTime> _membersNotGoing;
+        public IReadOnlyDictionary<MemberId, DateTime> MembersNotGoing => _membersNotGoing;
+
         public Meetup(MeetupTitle title, Location location)
         {
             Title = title;
@@ -20,6 +23,7 @@ namespace Meetup.Domain
             State = MeetupState.Created;
             NumberOfSeats = NumberOfSeats.None;
             _membersGoing = new Dictionary<MemberId, DateTime>();
+            _membersNotGoing = new Dictionary<MemberId, DateTime>();
         }
 
         public void UpdateNumberOfSeats(NumberOfSeats seats)
@@ -44,6 +48,14 @@ namespace Meetup.Domain
                 throw new ArgumentException(nameof(memberId));
 
             _membersGoing.Add(memberId, acceptedAt);
+        }
+
+        public void DeclineRSVP(MemberId memberId, DateTime declineAt)
+        {
+            if (State != MeetupState.Published)
+                throw new ArgumentException(nameof(memberId));
+
+            _membersNotGoing.Add(memberId, declineAt);
         }
     }
 
