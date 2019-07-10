@@ -12,8 +12,8 @@ namespace Meetup.Domain.Tests
         [Fact]
         public void MeetupCreateTest()
         {
-            var title = Auto.Create<string>();
-            var location = Auto.Create<string>();
+            var title = Auto.Create<MeetupTitle>();
+            var location = Auto.Create<Location>();
 
             var meetup = new Meetup(title, location);
             Assert.Equal(title, meetup.Title);
@@ -24,8 +24,8 @@ namespace Meetup.Domain.Tests
         [Fact]
         public void MeetupPublishTest()
         {
-            var title = Auto.Create<string>();
-            var location = Auto.Create<string>();
+            var title = Auto.Create<MeetupTitle>();
+            var location = Auto.Create<Location>();
             var seats = new NumberOfSeats(10);
 
             var meetup = new Meetup(title, location);
@@ -39,8 +39,8 @@ namespace Meetup.Domain.Tests
         [Fact]
         public void MeetupInvalidNumberOfSeatsTest()
         {
-            var title = Auto.Create<string>();
-            var location = Auto.Create<string>();
+            var title = Auto.Create<MeetupTitle>();
+            var location = Auto.Create<Location>();
 
             var meetup = new Meetup(title, location);
             Assert.Throws<ArgumentException>(

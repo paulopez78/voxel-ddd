@@ -4,12 +4,12 @@ namespace Meetup.Domain
 {
     public class Meetup
     {
-        public string Title { get; }
-        public string Location { get; }
+        public MeetupTitle Title { get; }
+        public Location Location { get; }
         public NumberOfSeats NumberOfSeats { get; private set; }
         public MeetupState State { get; private set; }
 
-        public Meetup(string title, string location)
+        public Meetup(MeetupTitle title, Location location)
         {
             Title = title;
             Location = location;
