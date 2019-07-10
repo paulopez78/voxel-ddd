@@ -3,11 +3,15 @@ using System.Collections.Generic;
 
 namespace Meetup.Domain
 {
+    public delegate bool AddressValidator(string location);
+
     public class Location : ValueObject
     {
-        public Location(string location)
+        public Location(AddressValidator validator, string location)
         {
-            if (string.IsNullOrEmpty(location) || string.IsNullOrWhiteSpace(location))
+            if (string.IsNullOrEmpty(location)
+                || string.IsNullOrWhiteSpace(location)
+                && !validator(location))
                 throw new ArgumentException(nameof(location));
 
             Value = location;
