@@ -42,6 +42,12 @@ namespace Meetup.Domain.Tests
                 when: meetup => meetup.Publish()
             );
 
+        [Fact]
+        public void GivenCreatedMeetup_When_Cancel_Then_Throws() =>
+            GivenCreatedMeetup<ArgumentException>(
+                when: meetup => meetup.Cancel()
+            );
+
         [Theory]
         [InlineData(1)]
         [InlineData(1000)]
