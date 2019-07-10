@@ -3,6 +3,7 @@ using Xunit;
 using Meetup.Domain;
 using AutoFixture;
 using static Meetup.Domain.Tests.MeetupTestExtensions;
+using System.Collections.Generic;
 
 namespace Meetup.Domain.Tests
 {
@@ -48,6 +49,18 @@ namespace Meetup.Domain.Tests
                 when: meetup => meetup.Cancel()
             );
 
+        [Fact]
+        public void GivenPublishedMeetup_When_AcceptRSVP_Then_MemberGoing()
+        {
+            var memberId = Auto.Create<MemberId>();
+            var acceptedAt = Auto.Create<DateTime>();
+
+            GivenPublishedMeetup(
+                when: meetup => meetup.AcceptRSVP(memberId, acceptedAt),
+                then: meetup => meetup.MembersGoing.AssertContains(memberId)
+            );
+        }
+
         [Theory]
         [InlineData(1)]
         [InlineData(1000)]
@@ -90,11 +103,26 @@ namespace Meetup.Domain.Tests
             var meetup = new Meetup(title, location);
             Assert.Throws<TException>(() => when(meetup));
         }
+
         public static void GivenCreatedMeetup(Action<Meetup> when, Action<Meetup> then)
         {
             var meetup = new Meetup(title, location);
             when(meetup);
             then(meetup);
+        }
+
+        public static void GivenPublishedMeetup(Action<Meetup> when, Action<Meetup> then)
+        {
+            var meetup = new Meetup(title, location);
+            meetup.UpdateNumberOfSeats(seats);
+            meetup.Publish();
+            when(meetup);
+            then(meetup);
+        }
+
+        public static void AssertContains(this IReadOnlyDictionary<MemberId, DateTime> @this, MemberId memberId)
+        {
+            Assert.True(@this.ContainsKey(memberId));
         }
     }
 }
