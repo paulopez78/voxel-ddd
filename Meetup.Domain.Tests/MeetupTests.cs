@@ -16,7 +16,7 @@ namespace Meetup.Domain.Tests
             var title = Auto.Create<MeetupTitle>();
             var location = Auto.Create<Location>();
 
-            var meetup = new Meetup(title, location);
+            var meetup = new MeetupAggregate(title, location);
             Assert.Equal(title, meetup.Title);
             Assert.Equal(location, meetup.Location);
             Assert.Equal(MeetupState.Created, meetup.State);
@@ -109,23 +109,23 @@ namespace Meetup.Domain.Tests
         public static Location location = Auto.Create<Location>();
         public static NumberOfSeats seats = new NumberOfSeats(10);
 
-        public static void GivenCreatedMeetup<TException>(Action<Meetup> when)
+        public static void GivenCreatedMeetup<TException>(Action<MeetupAggregate> when)
         where TException : Exception
         {
-            var meetup = new Meetup(title, location);
+            var meetup = new MeetupAggregate(title, location);
             Assert.Throws<TException>(() => when(meetup));
         }
 
-        public static void GivenCreatedMeetup(Action<Meetup> when, Action<Meetup> then)
+        public static void GivenCreatedMeetup(Action<MeetupAggregate> when, Action<MeetupAggregate> then)
         {
-            var meetup = new Meetup(title, location);
+            var meetup = new MeetupAggregate(title, location);
             when(meetup);
             then(meetup);
         }
 
-        public static void GivenPublishedMeetup(Action<Meetup> when, Action<Meetup> then)
+        public static void GivenPublishedMeetup(Action<MeetupAggregate> when, Action<MeetupAggregate> then)
         {
-            var meetup = new Meetup(title, location);
+            var meetup = new MeetupAggregate(title, location);
             meetup.UpdateNumberOfSeats(seats);
             meetup.Publish();
             when(meetup);

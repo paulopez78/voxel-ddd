@@ -17,11 +17,21 @@ namespace Meetup.Domain
             Value = location;
         }
 
-        public string Value { get; }
+        private Location()
+        {
+            Value = string.Empty;
+        }
+
+        public string Value { get; private set; }
+        public static Location None = new Location();
+
+        public static implicit operator string(Location location) => location.Value;
 
         protected override IEnumerable<object> GetAtomicValues()
         {
             yield return Value;
         }
+
+        public Location From(string location) => new Location() { Value = location };
     }
 }
