@@ -20,10 +20,14 @@ namespace Meetup.IntegrationTests
             var title = auto.Create<string>();
             var location = auto.Create<string>();
             var seats = auto.Create<int>();
+            var bob = auto.Create<Guid>();
+            var carla = auto.Create<Guid>();
 
             await _client.Create(meetupId, title, location);
             await _client.UpdateSeats(meetupId, seats);
             await _client.Publish(meetupId);
+            await _client.AcceptRSVP(meetupId, bob, DateTime.UtcNow);
+            await _client.RejectRSVP(meetupId, carla, DateTime.UtcNow);
 
             var meetup = await _client.Get(meetupId);
 
@@ -32,6 +36,8 @@ namespace Meetup.IntegrationTests
             Assert.Equal(title, meetup.Title);
             Assert.Equal(seats, meetup.NumberOfSeats);
             Assert.Equal(Meetup.MeetupState.Published, meetup.State);
+            Assert.True(meetup.MembersGoing.ContainsKey(bob));
+            Assert.True(meetup.MembersNotGoing.ContainsKey(carla));
         }
     }
 }

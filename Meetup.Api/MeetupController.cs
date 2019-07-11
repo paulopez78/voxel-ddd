@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,7 +26,9 @@ namespace Meetup.Api.Controllers
                 Title = meetup.Title.Value,
                 Location = meetup.Location.Value,
                 NumberOfSeats = meetup.NumberOfSeats.Value,
-                State = meetup.State.ToString()
+                State = meetup.State.ToString(),
+                MembersGoing = meetup.MembersGoing.ToDictionary(x => x.Key.Value.ToString(), y => y.Value),
+                MembersNotGoing = meetup.MembersNotGoing.ToDictionary(x => x.Key.Value.ToString(), y => y.Value)
             });
         }
 
