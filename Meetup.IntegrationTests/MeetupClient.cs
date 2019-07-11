@@ -57,6 +57,9 @@ namespace Meetup.IntegrationTests
         public async Task<Attendants> GetAttendes(Guid id)
         {
             var response = await _client.GetAsync($"attendants/{id}");
+            var log = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Get RESPONSE: {log}");
+
             var content = await response.Content.ReadAsStringAsync();
             return await response.Content.ReadAsAsync<Attendants>();
         }
@@ -77,9 +80,9 @@ namespace Meetup.IntegrationTests
     public class Attendants
     {
         public Guid MeetupId { get; set; }
-        public List<Guid> Going { get; set; }
-        public List<Guid> NotGoing { get; set; }
-        public List<Guid> Waiting { get; set; }
+        public List<Guid> MembersGoing { get; set; }
+        public List<Guid> MembersNotGoing { get; set; }
+        public List<Guid> WaitingList { get; set; }
     }
 
     public class Meetup

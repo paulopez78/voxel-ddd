@@ -45,9 +45,9 @@ namespace Meetup.IntegrationTests
 
             var attendes = await _client.GetAttendes(meetupId);
 
-            attendes.Going.AssertEqual(bob, carla);
-            attendes.Waiting.AssertEqual(bill);
-            Assert.Empty(attendes.NotGoing);
+            attendes.MembersGoing.AssertEqual(bob, carla);
+            attendes.WaitingList.AssertEqual(bill);
+            Assert.Empty(attendes.MembersNotGoing);
         }
     }
     public static class MeetupTestExtensions

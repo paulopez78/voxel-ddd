@@ -34,8 +34,8 @@ namespace Meetup.Api
                 MeetupId = doc.MeetupId,
                 MeetupCapacity = doc.MeetupCapacity,
                 WaitingList = doc.Waiting,
-                MembersGoing = doc.NotGoing,
-                MembersNotGoing = doc.Going
+                MembersGoing = doc.Going,
+                MembersNotGoing = doc.NotGoing
             };
         }
 
