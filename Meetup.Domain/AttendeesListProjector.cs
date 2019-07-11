@@ -24,6 +24,9 @@ namespace Meetup.Domain
         {
             switch (ev)
             {
+                case Events.MeetupCreated created:
+                    readModel.MeetupId = created.MeetupId;
+                    break;
                 case Events.NumberOfSeatsUpdated seats:
                     readModel.MeetupCapacity = seats.NumberOfSeats;
                     break;
@@ -61,6 +64,7 @@ namespace Meetup.Domain
 
     public class AttendeesListReadModel
     {
+        public Guid MeetupId { get; set; }
         public List<Guid> MembersGoing { get; set; } = new List<Guid>();
         public List<Guid> WaitingList { get; set; } = new List<Guid>();
         public List<Guid> MembersNotGoing { get; set; } = new List<Guid>();
