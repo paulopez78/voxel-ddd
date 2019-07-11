@@ -54,6 +54,13 @@ namespace Meetup.IntegrationTests
                 RejectedAt = rejectedAt
             });
 
+        public async Task<Attendants> GetAttendes(Guid id)
+        {
+            var response = await _client.GetAsync($"attendants/{id}");
+            var content = await response.Content.ReadAsStringAsync();
+            return await response.Content.ReadAsAsync<Attendants>();
+        }
+
         public Task<HttpResponseMessage> Cancel(Guid id) =>
             _client.PutAsJsonAsync("cancel", new
             {
@@ -65,6 +72,14 @@ namespace Meetup.IntegrationTests
             var response = await _client.GetAsync($"{id}");
             return await response.Content.ReadAsAsync<Meetup>();
         }
+    }
+
+    public class Attendants
+    {
+        public Guid MeetupId { get; set; }
+        public List<Guid> Going { get; set; }
+        public List<Guid> NotGoing { get; set; }
+        public List<Guid> Waiting { get; set; }
     }
 
     public class Meetup

@@ -106,10 +106,12 @@ namespace Meetup.Domain
 
                 case Events.RSVPAccepted accepted:
                     _membersGoing.Add(MemberId.From(accepted.MemberId), accepted.AcceptedAt);
+                    _membersNotGoing.Remove(MemberId.From(accepted.MemberId));
                     break;
 
                 case Events.RSVPDeclined declined:
                     _membersNotGoing.Add(MemberId.From(declined.MemberId), declined.DeclinedAt);
+                    _membersGoing.Remove(MemberId.From(declined.MemberId));
                     break;
             }
         }
