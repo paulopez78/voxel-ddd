@@ -20,39 +20,39 @@ namespace Meetup.Api
             _collection = client.GetDatabase("voxel").GetCollection<AttendantsMongoDocument>("attendants");
         }
 
-        // public async Task<AttendantsReadModel> Get(Guid meetupId)
-        // {
-        //     var doc = await _collection.Find<AttendantsMongoDocument>(doc => doc.MeetupId == meetupId).FirstOrDefaultAsync();
+        public async Task<AttendeesListReadModel> Get(Guid meetupId)
+        {
+            var doc = await _collection.Find<AttendantsMongoDocument>(doc => doc.MeetupId == meetupId).FirstOrDefaultAsync();
 
-        //     if (doc == null)
-        //     {
-        //         return null;
-        //     }
+            if (doc == null)
+            {
+                return null;
+            }
 
-        //     return new AttendantsReadModel
-        //     {
-        //         MeetupId = doc.MeetupId,
-        //         MeetupCapacity = doc.MeetupCapacity,
-        //         Waiting = doc.Waiting,
-        //         NotGoing = doc.NotGoing,
-        //         Going = doc.Going
-        //     };
-        // }
+            return new AttendeesListReadModel
+            {
+                MeetupId = doc.MeetupId,
+                MeetupCapacity = doc.MeetupCapacity,
+                WaitingList = doc.Waiting,
+                MembersGoing = doc.NotGoing,
+                MembersNotGoing = doc.Going
+            };
+        }
 
-        // public async Task Save(AttendantsReadModel readModel)
-        // {
-        //     await _collection.ReplaceOneAsync(doc => doc.MeetupId == readModel.MeetupId, new AttendantsMongoDocument
-        //     {
-        //         MeetupId = readModel.MeetupId,
-        //         MeetupCapacity = readModel.MeetupCapacity,
-        //         Waiting = readModel.Waiting,
-        //         NotGoing = readModel.NotGoing,
-        //         Going = readModel.Going
-        //     }, new UpdateOptions
-        //     {
-        //         IsUpsert = true
-        //     });
-        // }
+        public async Task Save(AttendeesListReadModel readModel)
+        {
+            await _collection.ReplaceOneAsync(doc => doc.MeetupId == readModel.MeetupId, new AttendantsMongoDocument
+            {
+                MeetupId = readModel.MeetupId,
+                MeetupCapacity = readModel.MeetupCapacity,
+                Waiting = readModel.WaitingList,
+                NotGoing = readModel.MembersNotGoing,
+                Going = readModel.MembersGoing
+            }, new UpdateOptions
+            {
+                IsUpsert = true
+            });
+        }
     }
 
     public class AttendantsMongoDocument
