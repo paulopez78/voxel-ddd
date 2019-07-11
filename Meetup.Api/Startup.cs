@@ -1,3 +1,4 @@
+using EasyNetQ;
 using Meetup.Domain;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -21,8 +22,9 @@ namespace Meetup.Api
             services.AddSingleton<AddressValidator>(address => true);
             services.AddScoped<MeetupAppService>();
             services.AddScoped<MeetupRepository>();
-            // var messageBroker = Configuration.GetValue("messagebroker", "host=localhost;username=guest;password=guest;publisherConfirms=true");
-            // services.AddSingleton<IBus>(RabbitHutch.CreateBus(messageBroker));
+            services.AddScoped<AttendeesRepository>();
+            var messageBroker = Configuration.GetValue("messagebroker", "host=localhost;username=guest;password=guest;publisherConfirms=true");
+            services.AddSingleton<IBus>(RabbitHutch.CreateBus(messageBroker));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

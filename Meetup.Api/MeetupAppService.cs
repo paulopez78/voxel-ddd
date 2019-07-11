@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using EasyNetQ;
 using Meetup.Domain;
 
 namespace Meetup.Api
@@ -8,11 +9,13 @@ namespace Meetup.Api
     {
         private readonly MeetupRepository _repo;
         private readonly AddressValidator _addressValidator;
+        private readonly IBus _bus;
 
-        public MeetupAppService(MeetupRepository repo, AddressValidator addressValidator)
+        public MeetupAppService(MeetupRepository repo, AddressValidator addressValidator, IBus bus)
         {
             _repo = repo;
             _addressValidator = addressValidator;
+            _bus = bus;
         }
 
         public Task Handle(object command) => command switch
@@ -59,6 +62,11 @@ namespace Meetup.Api
             var meetup = await _repo.Get(id);
             command(meetup);
             await ExecuteTransaction(meetup);
+
+            foreach (var ev in meetup.Events)
+            {
+                await _bus.PublishAsync((dynamic)ev);
+            }
         }
 
         public Task<MeetupAggregate> Get(Guid id) => _repo.Get(id);
