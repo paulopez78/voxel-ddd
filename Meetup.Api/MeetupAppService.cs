@@ -15,34 +15,27 @@ namespace Meetup.Api
             _addressValidator = addressValidator;
         }
 
-        public async Task Handle(object command)
+        public Task Handle(object command) => command switch
         {
-            switch (command)
-            {
-                case Meetup.V1.Create cmd:
-                    await ExecuteTransaction(
-                    new MeetupAggregate(
-                        new MeetupId(cmd.Id),
-                        new MeetupTitle(cmd.Title),
-                        new Location(_addressValidator, cmd.Location)));
-                    break;
+            Meetup.V1.Create cmd =>
+                ExecuteTransaction(
+                new MeetupAggregate(
+                    new MeetupId(cmd.Id),
+                    new MeetupTitle(cmd.Title),
+                    new Location(_addressValidator, cmd.Location))),
 
-                case Meetup.V1.UpdateNumberOfSeats cmd:
-                    await ExecuteCommand(
-                        cmd.Id,
-                        m => m.UpdateNumberOfSeats(new NumberOfSeats(cmd.NumberOfSeats)));
-                    break;
+            Meetup.V1.UpdateNumberOfSeats cmd =>
+                ExecuteCommand(
+                    cmd.Id,
+                    m => m.UpdateNumberOfSeats(new NumberOfSeats(cmd.NumberOfSeats))),
 
-                case Meetup.V1.Publish cmd:
-                    await ExecuteCommand(
-                        cmd.Id,
-                        m => m.Publish());
-                    break;
+            Meetup.V1.Publish cmd =>
+                ExecuteCommand(
+                    cmd.Id,
+                    m => m.Publish()),
 
-                default:
-                    throw new ApplicationException("no match");
-            }
-        }
+            _ => throw new ApplicationException("no match")
+        };
 
         private async Task ExecuteTransaction(MeetupAggregate meetup)
         {
