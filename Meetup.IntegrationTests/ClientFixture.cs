@@ -29,6 +29,7 @@ namespace Meetup.IntegrationTests
 
         public void Dispose()
         {
+
         }
     }
 }

@@ -16,45 +16,59 @@ namespace Meetup.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public Task<ActionResult> Get(Guid id)
+        public async Task<ActionResult> Get(Guid id)
         {
-            throw new NotImplementedException();
+            var meetup = await _appService.Get(id);
+            return Ok(new
+            {
+                Id = meetup.Id.Value,
+                Title = meetup.Title.Value,
+                Location = meetup.Location.Value,
+                NumberOfSeats = meetup.NumberOfSeats.Value,
+                State = meetup.State.ToString()
+            });
         }
 
         [HttpPost]
-        public Task<ActionResult> Post(Meetup.V1.Create request)
+        public async Task<ActionResult> Post(Meetup.V1.Create request)
         {
-            throw new NotImplementedException();
+            await _appService.Handle(request);
+            return Ok();
         }
 
         [HttpPut("seats")]
-        public Task<ActionResult> Put(Meetup.V1.UpdateNumberOfSeats request)
+        public async Task<ActionResult> Put(Meetup.V1.UpdateNumberOfSeats request)
         {
-            throw new NotImplementedException();
+            await _appService.Handle(request);
+            return Ok();
         }
 
         [HttpPut("publish")]
-        public Task<ActionResult> Put(Meetup.V1.Publish request)
+        public async Task<ActionResult> Put(Meetup.V1.Publish request)
         {
-            throw new NotImplementedException();
+            await _appService.Handle(request);
+            return Ok();
         }
 
         [HttpPut("cancel")]
-        public Task<ActionResult> Put(Meetup.V1.Cancel request)
+        public async Task<ActionResult> Put(Meetup.V1.Cancel request)
         {
-            throw new NotImplementedException();
+            await _appService.Handle(request);
+            return Ok();
         }
 
         [HttpPut("acceptrsvp")]
-        public Task<ActionResult> Put(Meetup.V1.AcceptRSVP request)
+        public async Task<ActionResult> Put(Meetup.V1.AcceptRSVP request)
         {
-            throw new NotImplementedException();
+            await _appService.Handle(request);
+            return Ok();
         }
 
         [HttpPut("declinersvp")]
-        public Task<ActionResult> Put(Meetup.V1.DeclineRSVP request)
+        public async Task<ActionResult> Put(Meetup.V1.DeclineRSVP request)
         {
-            throw new NotImplementedException();
+            await _appService.Handle(request);
+            return Ok();
         }
     }
 }
