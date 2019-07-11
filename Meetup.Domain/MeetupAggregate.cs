@@ -39,8 +39,27 @@ namespace Meetup.Domain
         public MeetupAggregate(MeetupId id, MeetupTitle title, Location location) =>
             Apply(new Events.MeetupCreated { MeetupId = id, Title = title, Location = location });
 
+        private MeetupAggregate()
+        {
+        }
+
+        public static MeetupAggregate From(object[] events)
+        {
+            var meetup = new MeetupAggregate();
+            foreach (var ev in events)
+            {
+                meetup.When(ev);
+            }
+            return meetup;
+        }
+
         public void UpdateNumberOfSeats(NumberOfSeats seats) =>
             Apply(new Events.NumberOfSeatsUpdated { MeetupId = Id, NumberOfSeats = seats });
+
+        public static object From(object p)
+        {
+            throw new NotImplementedException();
+        }
 
         public void Publish()
         {
@@ -55,6 +74,7 @@ namespace Meetup.Domain
             State = State.TransitionTo(MeetupState.Canceled);
             Apply(new Events.MeetupCanceled { MeetupId = Id });
         }
+
 
         public void AcceptRSVP(MemberId memberId, DateTime acceptedAt)
         {

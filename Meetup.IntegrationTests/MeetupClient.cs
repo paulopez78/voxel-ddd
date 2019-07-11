@@ -79,7 +79,7 @@ namespace Meetup.IntegrationTests
 
     public class Attendants
     {
-        public Guid MeetupId { get; set; }
+        public Guid Id { get; set; }
         public List<Guid> MembersGoing { get; set; }
         public List<Guid> MembersNotGoing { get; set; }
         public List<Guid> WaitingList { get; set; }

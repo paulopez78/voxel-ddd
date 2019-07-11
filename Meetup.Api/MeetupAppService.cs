@@ -2,23 +2,22 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using EasyNetQ;
+using Marten;
 using Meetup.Domain;
 
 namespace Meetup.Api
 {
     public class MeetupAppService
     {
-        private readonly MeetupRepository _repo;
+        private readonly IDocumentStore _documentStore;
         private readonly AddressValidator _addressValidator;
         private readonly IBus _bus;
-        private readonly AttendeesRepository _readModelRepo;
 
-        public MeetupAppService(MeetupRepository repo, AttendeesRepository readModelRepo, AddressValidator addressValidator, IBus bus)
+        public MeetupAppService(IDocumentStore store, AddressValidator addressValidator, IBus bus)
         {
-            _repo = repo;
+            _documentStore = store;
             _addressValidator = addressValidator;
             _bus = bus;
-            _readModelRepo = readModelRepo;
         }
 
         public Task Handle(object command) => command switch
@@ -60,34 +59,49 @@ namespace Meetup.Api
 
         private async Task ExecuteCommand(Guid id, Action<MeetupAggregate> command)
         {
-            var meetup = await Get(id);
+            using var session = _documentStore.OpenSession();
+
+            var events = await session.Events.FetchStreamAsync(id);
+            var meetup = MeetupAggregate.From(events.Select(x => x.Data).ToArray());
             command(meetup);
+
             await ExecuteTransaction(meetup);
+            session.Events.Append(id, meetup.Events);
+            await session.SaveChangesAsync();
         }
 
-        private async Task ExecuteTransaction(MeetupAggregate meetup)
+        private async Task ExecuteTransaction(MeetupAggregate meetup, IDocumentSession session)
         {
-            await _repo.Save(meetup);
-            await PersistProjections(meetup);
-
+            await PersistProjections(meetup, session);
             foreach (var @event in meetup.Events)
             {
                 await _bus.PublishAsync((dynamic)@event);
             }
         }
 
-        private async Task PersistProjections(MeetupAggregate meetup)
+        private async Task ExecuteTransaction(MeetupAggregate meetup)
         {
-            var readModel = await _readModelRepo.Get(meetup.Id);
+            using var session = _documentStore.OpenSession();
+            await ExecuteTransaction(meetup, session);
+        }
+
+        private async Task PersistProjections(MeetupAggregate meetup, IDocumentSession session)
+        {
+            var readModel = await session.LoadAsync<AttendeesListReadModel>(meetup.Id);
             if (readModel == null)
             {
                 readModel = new AttendeesListReadModel();
             }
 
             var updatedReadModel = new AttendeesListProjector().Project(readModel, meetup.Events.ToArray());
-            await _readModelRepo.Save(updatedReadModel);
+            session.Store(readModel);
         }
 
-        public Task<MeetupAggregate> Get(Guid id) => _repo.Get(id);
+        public async Task<MeetupAggregate> Get(Guid id)
+        {
+            using var session = _documentStore.OpenSession();
+            var events = await session.Events.FetchStreamAsync(id);
+            return MeetupAggregate.From(events.Select(x => x.Data).ToArray());
+        }
     }
 }

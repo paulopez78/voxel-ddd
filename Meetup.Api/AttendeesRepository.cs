@@ -31,7 +31,7 @@ namespace Meetup.Api
 
             return new AttendeesListReadModel
             {
-                MeetupId = doc.MeetupId,
+                Id = doc.MeetupId,
                 MeetupCapacity = doc.MeetupCapacity,
                 WaitingList = doc.Waiting,
                 MembersGoing = doc.Going,
@@ -41,9 +41,9 @@ namespace Meetup.Api
 
         public async Task Save(AttendeesListReadModel readModel)
         {
-            await _collection.ReplaceOneAsync(doc => doc.MeetupId == readModel.MeetupId, new AttendantsMongoDocument
+            await _collection.ReplaceOneAsync(doc => doc.MeetupId == readModel.Id, new AttendantsMongoDocument
             {
-                MeetupId = readModel.MeetupId,
+                MeetupId = readModel.Id,
                 MeetupCapacity = readModel.MeetupCapacity,
                 Waiting = readModel.WaitingList,
                 NotGoing = readModel.MembersNotGoing,
