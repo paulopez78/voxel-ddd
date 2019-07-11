@@ -34,13 +34,25 @@ namespace Meetup.Api
                     cmd.Id,
                     m => m.Publish()),
 
+            Meetup.V1.Cancel cmd =>
+                ExecuteCommand(
+                    cmd.Id,
+                    m => m.Cancel()),
+
+            Meetup.V1.AcceptRSVP cmd =>
+                ExecuteCommand(
+                    cmd.Id,
+                    m => m.AcceptRSVP(new MemberId(cmd.MemberId), DateTime.UtcNow)),
+
+            Meetup.V1.DeclineRSVP cmd =>
+                ExecuteCommand(
+                    cmd.Id,
+                    m => m.DeclineRSVP(new MemberId(cmd.MemberId), DateTime.UtcNow)),
+
             _ => throw new ApplicationException("no match")
         };
 
-        private async Task ExecuteTransaction(MeetupAggregate meetup)
-        {
-            await _repo.Save(meetup);
-        }
+        private Task ExecuteTransaction(MeetupAggregate meetup) => _repo.Save(meetup);
 
         private async Task ExecuteCommand(Guid id, Action<MeetupAggregate> command)
         {
